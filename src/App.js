@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { generate } from "random-words";
-const N = 100;
-const S = 15;
 
 function App() {
   const [words, setWords] = useState([]);
-  const [countDown, setCountDown] = useState(S);
+  const [countDown, setCountDown] = useState(15);
   const [currentInput, setCurrentInput] = useState("");
   const [currWordIndex, setCurrWordIndex] = useState(0);
   const [currCharIndex, setCurrCharIndex] = useState(-1);
@@ -26,11 +24,7 @@ function App() {
   }, [status]);
 
   function generateWords() {
-    return new Array(N).fill(null).map(() => generate());
-  }
-
-  function restart() {
-    window.location.reload();
+    return new Array(200).fill(null).map(() => generate());
   }
 
   function start() {
@@ -39,18 +33,20 @@ function App() {
       setCurrWordIndex(0);
       setCorrect(0);
       setInCorrect(0);
-      setCurrCharIndex(-1)
-      setCurrChar("")
+      setCurrCharIndex(-1);
+      setCurrChar("");
     }
+
     if (status !== "started") {
       setStatus("started");
     }
+    console.log(status);
     let interval = setInterval(() => {
       setCountDown((prevCountDown) => {
         if (prevCountDown === 0) {
           clearInterval(interval);
           setStatus("finished");
-          return S;
+          return countDown;
         } else {
           return prevCountDown - 1;
         }
@@ -64,9 +60,9 @@ function App() {
       setCurrCharIndex(-1);
       setCurrentInput("");
       setCurrWordIndex(currWordIndex + 1);
-    } else if(keyCode === 8) {
-      setCurrCharIndex(currCharIndex - 1)
-      setCurrChar("")
+    } else if (keyCode === 8) {
+      setCurrCharIndex(currCharIndex - 1);
+      setCurrChar("");
     } else {
       setCurrCharIndex(currCharIndex + 1);
       setCurrChar(key);
@@ -93,16 +89,67 @@ function App() {
       } else {
         return "has-background-danger";
       }
-    } else if(wordIdx === currWordIndex && currCharIndex >= words[currWordIndex].length) { 
-      return'has-background-danger';
-    }  else {
+    } else if (
+      wordIdx === currWordIndex &&
+      currCharIndex >= words[currWordIndex].length
+    ) {
+      return "has-background-danger";
+    } else {
       return "";
     }
+  }
+  function getAccuracy() {
+    if (incorrect === 0) {
+      return 100;
+    }
+    if (correct === 0) {
+      return 0;
+    }
+    return Math.round((correct / (correct * incorrect)) * 100);
   }
 
   return (
     <>
       <div className="App">
+        <div className="section">
+          <span>Time: </span>
+          <button
+            id={1}
+            type="button"
+            onClick={() => {
+              setCountDown(15);
+            }}
+          >
+            15
+          </button>
+          <button
+            id={2}
+            type="button"
+            onClick={() => {
+              setCountDown(30);
+            }}
+          >
+            30
+          </button>
+          <button
+            id={3}
+            type="button"
+            onClick={() => {
+              setCountDown(60);
+            }}
+          >
+            60
+          </button>
+          <button
+            id={4}
+            type="button"
+            onClick={() => {
+              setCountDown(120);
+            }}
+          >
+            120
+          </button>
+        </div>
         <div className="is-size-1 has-text-centered has-text-primary">
           {countDown}
         </div>
@@ -140,13 +187,13 @@ function App() {
             <div className="columns">
               <div className="column has-text-centered">
                 <p className="is-size-5">WPM</p>
-                <p className="has-text-primary is-size-1">{correct * 4}</p>
+                <p className="has-text-primary is-size-1">
+                  {correct * (60 / countDown)}
+                </p>
               </div>
               <div className="column">
                 <div className="is-size-5">Accuracy :</div>
-                <p className="has-text-info is-size-1">
-                  {Math.round((correct / (correct * incorrect)) * 100)} %
-                </p>
+                <p className="has-text-info is-size-1">{getAccuracy()} %</p>
               </div>
             </div>
           </div>
@@ -171,7 +218,12 @@ function App() {
         </div>
 
         <div className="section">
-          <button className="button is-info" onClick={restart}>
+          <button
+            className="button is-info"
+            onClick={() => {
+              window.location.reload();
+            }}
+          >
             Restart
           </button>
         </div>
