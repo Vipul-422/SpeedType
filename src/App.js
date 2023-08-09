@@ -13,14 +13,15 @@ function App() {
   const [status, setStatus] = useState("waiting");
   const textInput = useRef(null);
 
-  useEffect(() => {
-    setWords(generateWords());
-  }, []);
+  // useEffect(() => {
+
+  // }, []);
 
   useEffect(() => {
     if (status === "started") {
       textInput.current.focus();
     }
+    setWords(generateWords());
   }, [status]);
 
   function generateWords() {
@@ -105,130 +106,143 @@ function App() {
     if (correct === 0) {
       return 0;
     }
-    return Math.round((correct / (correct * incorrect)) * 100);
+    return Math.round((correct / (correct * incorrect) + Number.EPSILON) * 100);
   }
 
   return (
-    <>
-      <div className="App">
-        <div className="section">
-          <span>Time: </span>
-          <button
-            id={1}
-            type="button"
-            onClick={() => {
-              setCountDown(15);
-            }}
-          >
-            15
-          </button>
-          <button
-            id={2}
-            type="button"
-            onClick={() => {
-              setCountDown(30);
-            }}
-          >
-            30
-          </button>
-          <button
-            id={3}
-            type="button"
-            onClick={() => {
-              setCountDown(60);
-            }}
-          >
-            60
-          </button>
-          <button
-            id={4}
-            type="button"
-            onClick={() => {
-              setCountDown(120);
-            }}
-          >
-            120
-          </button>
+    <div className="bg-slate-900 text-center text-cyan-200 ">
+      <div>
+        <div className="text-2xl font-medium uppercase text-lime-200">
+          Speed Type
         </div>
-        <div className="is-size-1 has-text-centered has-text-primary">
-          {countDown}
-        </div>
-        {status === "started" && (
-          <div className="section">
-            <div className="card">
-              <div className="card-section">
-                <div className="content">
-                  {words.map((word, i) => {
-                    return (
-                      <span>
-                        <span key={i}>
-                          {word.split("").map((char, idx) => {
-                            return (
-                              <span
-                                className={getCharClass(i, idx, char)}
-                                key={idx}
-                              >
-                                {char}
-                              </span>
-                            );
-                          })}
+        <div>
+          <div className="container">
+            <div>Time: </div>
+            <div className="flex space-x-4 justify-center">
+              <button
+                id={1}
+                type="button"
+                className="text-lime-200 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 inline-flex rounded-md shadow-sm bg-trasparent p-2"
+                onClick={() => {
+                  setCountDown(15);
+                }}
+              >
+                15
+              </button>
+              <button
+                id={2}
+                type="button"
+                className="text-lime-200 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 inline-flex rounded-md shadow-sm bg-trasparent p-2"
+                onClick={() => {
+                  setCountDown(30);
+                }}
+              >
+                30
+              </button>
+              <button
+                id={3}
+                type="button"
+                className="text-lime-200 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 inline-flex rounded-md shadow-sm bg-trasparent p-2"
+                onClick={() => {
+                  setCountDown(60);
+                }}
+              >
+                60
+              </button>
+              <button
+                id={4}
+                type="button"
+                className="text-lime-200 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 inline-flex rounded-md shadow-sm bg-trasparent p-2"
+                onClick={() => {
+                  setCountDown(120);
+                }}
+              >
+                120
+              </button>
+            </div>
+          </div>
+          <div>{countDown}</div>
+          {status === "started" && (
+            <div className="container">
+              <div className="card">
+                <div className="card-section">
+                  <div className="text-lime-200">
+                    {words.map((word, i) => {
+                      return (
+                        <span>
+                          <span key={i}>
+                            {word.split("").map((char, idx) => {
+                              return (
+                                <span
+                                  className={getCharClass(i, idx, char)}
+                                  key={idx}
+                                >
+                                  {char}
+                                </span>
+                              );
+                            })}
+                          </span>
+                          <span> </span>
                         </span>
-                        <span> </span>
-                      </span>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-        {status === "finished" && (
-          <div className="section">
-            <div className="columns">
-              <div className="column has-text-centered">
-                <p className="is-size-5">WPM</p>
-                <p className="has-text-primary is-size-1">
-                  {correct * (60 / countDown)}
-                </p>
-              </div>
-              <div className="column">
-                <div className="is-size-5">Accuracy :</div>
-                <p className="has-text-info is-size-1">{getAccuracy()} %</p>
+          )}
+          {status === "finished" && (
+            <div className="container">
+              <div className="columns">
+                <div className="column has-text-centered">
+                  <span className="text-lime-200">
+                    WPM :{" "}
+                    <span className="text-cyan-200">
+                      {correct * (60 / countDown)}
+                    </span>
+                  </span>
+                </div>
+                <div className="column">
+                  <div className="text-lime-200">
+                    Accuracy :{" "}
+                    <span className="text-cyan-200">{getAccuracy()} %</span>
+                  </div>
+                </div>
               </div>
             </div>
+          )}
+
+          <div className="container">
+            <button className="button is-info" onClick={start}>
+              Start
+            </button>
           </div>
-        )}
 
-        <div className="section">
-          <button className="button is-info" onClick={start}>
-            Start
-          </button>
-        </div>
+          <div>
+            <input
+              ref={textInput}
+              disabled={status !== "started"}
+              type="input"
+              className="bg-gray-800 text-lime-200"
+              onKeyDown={handleKeyDown}
+              value={currentInput}
+              onChange={(e) => setCurrentInput(e.target.value)}
+            />
+          </div>
 
-        <div className="control is-expanded section">
-          <input
-            ref={textInput}
-            disabled={status !== "started"}
-            type="text"
-            className="input"
-            onKeyDown={handleKeyDown}
-            value={currentInput}
-            onChange={(e) => setCurrentInput(e.target.value)}
-          />
-        </div>
-
-        <div className="section">
-          <button
-            className="button is-info"
-            onClick={() => {
-              window.location.reload();
-            }}
-          >
-            Restart
-          </button>
+          <div className="container">
+            <button
+              className="button is-info"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Restart
+            </button>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
